@@ -1376,6 +1376,7 @@ DEVICES += [{
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
     3343: ["Loock", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
+    1203: ["dsm", "Q3", "dsm.lock.q3"],
     "spec": [
         MiBeacon,
         # sensors:
@@ -1452,7 +1453,6 @@ DEVICES += [{
     2584: ["XinGuang", "Smart Light", "LIBMDA09X"],
     3164: ["LeMesh", "Mesh Light (RF ready)", "lemesh.light.wy0c07"],
     3531: ["LeMesh", "Mesh Light", "lemesh.light.wy0c08"],
-    7136: ["LeMesh", "Mesh Light v2", "lemesh.light.wy0c09"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
