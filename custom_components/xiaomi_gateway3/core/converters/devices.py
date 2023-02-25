@@ -1360,6 +1360,18 @@ DEVICES += [{
     ],
     "ttl": "3d"  # battery every 1? day
 }, {
+    1203: ["dsm", "Q3", "dsm.lock.q3"],
+    "spec": [
+        MiBeacon,
+        Converter("action", "sensor"),
+        Converter("action_id", "sensor"),
+        Converter("method_id", "sensor"),
+        Converter("method", "sensor"),
+        Converter("message", "sensor"),
+        Converter("key_id", "sensor"),
+        Converter("battery", "sensor"),
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
@@ -1376,7 +1388,6 @@ DEVICES += [{
     2480: ["Xiaomi", "Safe Box", "BGX-5/X1-3001"],
     3051: ["Aqara", "Door Lock D100", "ZNMS20LM"],
     3343: ["Loock", "Door Lock Classic 2X Pro", "loock.lock.cc2xpro"],
-    1203: ["dsm", "Q3", "dsm.lock.q3"],
     "spec": [
         MiBeacon,
         # sensors:
