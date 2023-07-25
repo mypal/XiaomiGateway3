@@ -1628,6 +1628,18 @@ DEVICES += [{
         EventConv("action", mi="2.e.1014", value="hold"),
     ]
 }, {
+    1203: ["dsm", "Q3", "dsm.lock.q3"],
+    "spec": [
+        MiBeacon,
+        Converter("action", "sensor"),
+        Converter("action_id", "sensor"),
+        Converter("method_id", "sensor"),
+        Converter("method", "sensor"),
+        Converter("message", "sensor"),
+        Converter("key_id", "sensor"),
+        Converter("battery", "sensor"),
+    ],
+}, {
     # BLE devices can be supported witout spec. New spec will be added
     # "on the fly" when device sends them. But better to rewrite right spec for
     # each device
@@ -1638,7 +1650,7 @@ DEVICES += [{
     1034: ["Xiaomi", "Mosquito Repellent", "WX08ZM"],
     1161: ["Xiaomi", "Toothbrush T500", "MES601"],
     # https://github.com/AlexxIT/XiaomiGateway3/issues/1001
-    1203: ["Dessmann ", "Q3", "dsm.lock.q3"],
+    # 1203: ["Dessmann ", "Q3", "dsm.lock.q3"],
     1433: ["Xiaomi", "Door Lock", "MJZNMS03LM"],
     1694: ["Aqara", "Door Lock N100 (Bluetooth)", "ZNMS16LM"],
     1695: ["Aqara", "Door Lock N200", "ZNMS17LM"],
@@ -1725,12 +1737,23 @@ DEVICES += [{
     2351: ["LeMesh", "Mesh Downlight", "lemesh.light.wy0c05"],
     2584: ["XinGuang", "Smart Light", "LIBMDA09X"],
     3164: ["LeMesh", "Mesh Light (RF ready)", "lemesh.light.wy0c07"],
-    7136: ["LeMesh", "Mesh Light v2", "lemesh.light.wy0c09"],
+    # 7136: ["LeMesh", "Mesh Light v2", "lemesh.light.wy0c09"],
     9439: ["GDDS", "Mesh Light", "gdds.light.wy0a01"],
     "spec": [
         Converter("light", "light", mi="2.p.1"),
         BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
         ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+    ]
+}, {
+    7136: ["LeMesh", "Mesh Light V2", "lemesh.light.wy0c09"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+        MapConv("effect", "select", mi="2.p.5", parent="light", map={
+            0: "自定义", 4: "日光", 5: "月光", 7: "温馨", 8: "影院", 9: "阅读", 10: "电脑",
+            11: "会客", 12: "娱乐", 13: "唤醒", 14: "黄昏", 15: "助眠"
+        }),
     ]
 }, {
     # https://home.miot-spec.com/spec/lemesh.light.wy0c08
