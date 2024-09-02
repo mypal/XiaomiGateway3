@@ -3521,3 +3521,53 @@ DEVICES += [{
         MapConv("power_on_state", "select", mi="5.1.7", map={0: "default", 1: "off", 2: "on"}),
     ],
 }]
+
+DEVICES = [{
+    1203: ["dsm", "Q3", "dsm.lock.q3"],
+    "spec": [
+        MiBeacon,
+        Converter("action", "sensor"),
+        Converter("action_id", "sensor"),
+        Converter("method_id", "sensor"),
+        Converter("method", "sensor"),
+        Converter("message", "sensor"),
+        Converter("key_id", "sensor"),
+        Converter("battery", "sensor"),
+    ],
+}, {
+    # https://www.ixbt.com/live/chome/umnaya-rozetka-xiaomi-zncz01zm-s-energomonitoringom-i-bluetooth-mesh-integraciya-v-home-assistant.html
+    # https://home.miot-spec.com/spec/zimi.plug.zncz01
+    3083: ["Xiaomi", "Electrical Outlet", "ZNCZ01ZM"],
+    "spec": [
+        Converter("outlet", "switch", mi="2.p.1"),
+        MathConv("power", "sensor", mi="3.p.1", multiply=0.01),
+        Converter("led", "switch", mi="4.p.1", enabled=False),
+        BoolConv("enable-upload-power", "switch", mi="6.p.1"),
+        Converter("power_protect", "switch", mi="7.p.1", enabled=False),
+        MathConv("power_value", "number", mi="7.p.2", multiply=0.01,
+                 min=0, max=163840000, enabled=False),
+    ],
+}, {
+    7136: ["LeMesh", "Mesh Light V2", "lemesh.light.wy0c09"],
+    "spec": [
+        Converter("light", "light", mi="2.p.1"),
+        BrightnessConv("brightness", mi="2.p.2", parent="light", max=100),
+        ColorTempKelvin("color_temp", mi="2.p.3", parent="light", mink=3000, maxk=6400),
+        MapConv("effect", "select", mi="2.p.5", parent="light", map={
+            0: "自定义", 4: "日光", 5: "月光", 7: "温馨", 8: "影院", 9: "阅读", 10: "电脑",
+            11: "会客", 12: "娱乐", 13: "唤醒", 14: "黄昏", 15: "助眠"
+        }),
+    ],
+}, {
+    8154: ["loock", "M20", "loock.lock.t2v1"],
+    "spec": [
+        MiBeacon,
+        Converter("action", "sensor"),
+        Converter("lock_status", "sensor", mi="2.p.1"),
+        Converter("lock_abnormal", "sensor", mi="2.p.2"),
+        Converter("lock_method", "sensor", mi="2.p.3"),
+        Converter("door_status", "sensor", mi="3.p.1"),
+        Converter("door_abnormal", "sensor", mi="3.p.2"),
+        Converter("battery", "sensor"),
+    ],
+}] + DEVICES
