@@ -6,16 +6,18 @@ from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry, device_registry
+from homeassistant.helpers import device_registry, entity_registry
 from homeassistant.helpers.aiohttp_client import (
     async_create_clientsession,
     async_get_clientsession,
 )
+from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers.restore_state import STATE_DUMP_INTERVAL
 from homeassistant.helpers.storage import Store
 
 from .. import XDevice
 from ..core import core_utils
-from ..core.const import DOMAIN, ZIGBEE, SUPPORTED_MODELS
+from ..core.const import DOMAIN, SUPPORTED_MODELS, ZIGBEE
 from ..core.gate.base import XGateway
 from ..core.xiaomi_cloud import MiCloud
 
@@ -38,8 +40,10 @@ async def store_devices(hass: HomeAssistant):
     if data := await store.async_load():
         XDevice.restore = data
 
-    # noinspection PyUnusedLocal
-    async def stop(*args):
+    async def dump_state(*args):
+        if not XDevice.restore:
+            return
+
         # update last_decode_ts for all devices in the store
         for device in XGateway.devices.values():
             store_device = XDevice.restore.setdefault(device.cloud_did, {})
@@ -50,9 +54,15 @@ async def store_devices(hass: HomeAssistant):
                 store_device["last_seen"] = {
                     gw.uid: last_seen for gw, last_seen in device.last_seen.items()
                 }
-        # save store if not empty
-        if XDevice.restore:
-            await store.async_save(XDevice.restore)
+
+        await store.async_save(XDevice.restore)
+
+    # Dump states periodically
+    cancel_interval = async_track_time_interval(hass, dump_state, STATE_DUMP_INTERVAL)
+
+    async def stop(*args):
+        cancel_interval()
+        await dump_state()
 
     hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, stop)
 
@@ -68,9 +78,14 @@ def get_cloud_gateways(hass: HomeAssistant) -> list[dict]:
 async def setup_cloud(hass: HomeAssistant, config_entry: ConfigEntry):
     data: dict = config_entry.data.copy()
 
-    session = async_create_clientsession(hass)
-    cloud = MiCloud(session, data["servers"])
-    if await cloud.login(data["username"], data["password"]):
+    cloud = MiCloud(async_create_clientsession(hass), data["servers"])
+
+    if token := data.get("token"):
+        await cloud.login_token(token)
+    else:
+        await cloud.login(data["username"], data["password"])
+
+    if cloud.ok:
         cloud.devices = await cloud.get_devices()  # load devices from cloud
 
     hass.data[DOMAIN][config_entry.entry_id] = cloud
@@ -90,7 +105,7 @@ async def setup_cloud(hass: HomeAssistant, config_entry: ConfigEntry):
 
         await update_device_name(hass, cloud_device)
 
-    return bool(cloud.auth)
+    return cloud.ok
 
 
 async def update_device_name(hass: HomeAssistant, cloud_device: dict):

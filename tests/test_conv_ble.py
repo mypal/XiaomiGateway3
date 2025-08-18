@@ -321,3 +321,82 @@ def test_10249():
         {"siid": 6, "eiid": 1006, "arguments": [{"piid": 1, "value": 1681029598}]}
     )
     assert p == {"action": "doorbell", "timestamp": 1681029598}
+
+
+def test_14523():
+    device = XDevice(14523)
+
+    p = device.decode({"eid": 18956, "edata": ""})
+    assert p == {"action": "single"}
+
+
+def test_18639():
+    device = XDevice(18639)
+
+    p = device.decode(
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 260823}]}
+    )
+    assert p == {"weight": 72.7}
+
+    p = device.decode(
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1338768096}]}
+    )
+    assert p == {"impedance_high": 510.6, "weight": 73.6}
+
+    p = device.decode(
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1234960384}]}
+    )
+    assert p == {"impedance_low": 471.1}
+
+    p = device.decode(
+        {"siid": 11, "eiid": 1022, "arguments": [{"piid": 2, "value": 1174444720}]}
+    )
+    assert p == {"heart_rate": 69, "impedance_high": 448.0, "weight": 68.8}
+
+
+def test_18051():
+    device = XDevice(18051)
+
+    p = device.decode({"eid": 22038, "edata": "05"})
+    assert p == {"unknown": "05"}
+    p = device.decode({"eid": 18437, "edata": "00c01e44"})
+    assert p == {"illuminance": 635}
+    p = device.decode({"eid": 18510, "edata": "02"})
+    assert p == {"occupancy": True}
+    p = device.decode({"eid": 18510, "edata": "01"})
+    assert p == {"occupancy": True}
+    p = device.decode({"eid": 18513, "edata": "0000"})
+    assert p == {"has_someone_duration": 0}
+
+
+def test_2691():
+    device = XDevice(2691)
+
+    p = device.decode({"eid": 4119, "edata": "3C000000"})
+    assert p == {"idle_time": 60}
+
+
+def test_8154():
+    device = XDevice(8154)
+
+    p = device.decode({"eid": 11, "edata": "2000000180777B2C66"})
+    assert p == {
+        "action": "lock",
+        "action_id": 0,
+        "error": None,
+        "key_id": 0,
+        "message": "Unlock outside the door",
+        "method": "biological",
+        "method_id": 2,
+        "timestamp": "2024-04-27T07:13:43",
+    }
+    p = device.decode({"eid": 7, "edata": "017F7B2C66"})
+    assert p == {
+        "action": "door",
+        "action_id": 1,
+        "contact": False,
+        "message": "Door is closed",
+        "timestamp": "2024-04-27T07:13:51",
+    }
+    p = device.decode({"eid": 4111, "edata": "01"})
+    assert p == {"door": False}
